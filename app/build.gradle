@@ -1,0 +1,49 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+
+    namespace 'com.mb4x.orbitalpredictor'
+
+    compileSdk 34
+
+    defaultConfig {
+
+        applicationId "com.mb4x.orbitalpredictor"
+
+        minSdk 21
+
+        targetSdk 34
+
+        versionCode 1
+
+        versionName "2.5"
+
+    }
+
+    buildTypes {
+
+        release {
+
+            minifyEnabled false
+
+        }
+
+    }
+
+    compileOptions {
+
+        sourceCompatibility JavaVersion.VERSION_17
+
+        targetCompatibility JavaVersion.VERSION_17
+
+    }
+
+}
+
+dependencies {
+
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+
+}
