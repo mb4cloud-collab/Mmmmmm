@@ -20,7 +20,7 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y build-essential libssl-dev libffi-dev python3-dev \
-                                zlib1g-dev ccache lld libncurses5 zip unzip openjdk-17-jdk
+                                zlib1g-dev ccache lld libncurses5-dev libncursesw5-dev zip unzip openjdk-17-jdk
 
     - name: Install Buildozer and Cython
       run: |
@@ -43,3 +43,4 @@ jobs:
       with:
         name: MB4X-Orbital-Predictor-APK
         path: bin/*.apk
+
