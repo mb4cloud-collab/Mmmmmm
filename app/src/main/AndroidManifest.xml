@@ -1,0 +1,265 @@
+package com.mb4x.orbitalpredictor;
+
+import android.graphics.Typeface;
+import android.os.Bundle;
+import android.text.InputType;
+import android.view.View;
+import android.widget.*;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.Locale;
+
+public class MainActivity extends AppCompatActivity {
+
+    EditText editM, editC, editH, editV;
+    TextView result;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        ScrollView scroll = new ScrollView(this);
+
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setPadding(40,40,40,40);
+
+        scroll.addView(layout);
+
+        TextView title = new TextView(this);
+        title.setText("🚀 MB4X Orbital Predictor");
+        title.setTextSize(24);
+        title.setTypeface(null, Typeface.BOLD);
+        layout.addView(title);
+
+        TextView sub = new TextView(this);
+        sub.setText("Orbital Lifetime Experimental Simulator");
+        layout.addView(sub);
+
+        editM = new EditText(this);
+        editM.setHint("Mass M (kg)");
+        editM.setInputType(InputType.TYPE_CLASS_NUMBER|InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        layout.addView(editM);
+
+        editC = new EditText(this);
+        editC.setHint("C coefficient");
+        editC.setInputType(InputType.TYPE_CLASS_NUMBER|InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        layout.addView(editC);
+
+        editH = new EditText(this);
+        editH.setHint("Altitude h (km)");
+        editH.setInputType(InputType.TYPE_CLASS_NUMBER|InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        layout.addView(editH);
+
+        editV = new EditText(this);
+        editV.setHint("Velocity V (m/s) اتركه فارغ للحساب التلقائي");
+        editV.setInputType(InputType.TYPE_CLASS_NUMBER|InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        layout.addView(editV);
+
+        Button calc = new Button(this);
+        calc.setText("Calculate");
+        layout.addView(calc);
+
+        result = new TextView(this);
+        result.setTextSize(16);
+        layout.addView(result);
+
+        setContentView(scroll);
+
+        calc.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                calculate();
+
+            }
+        });
+
+    }
+
+    //------------------------------------------
+
+    private double density(double h){
+
+        if(h>=1000) return 3e-15;
+        if(h>=900) return 8e-15;
+        if(h>=800) return 2e-14;
+        if(h>=700) return 8e-14;
+        if(h>=600) return 2e-13;
+        if(h>=500) return 6e-13;
+        if(h>=450) return 2e-12;
+        if(h>=400) return 4e-12;
+        if(h>=350) return 1e-11;
+        if(h>=300) return 2e-11;
+        if(h>=280) return 1e-11;
+        if(h>=250) return 7e-11;
+        if(h>=220) return 2e-10;
+        if(h>=200) return 3e-10;
+        if(h>=180) return 2e-9;
+        if(h>=150) return 2e-8;
+        if(h>=120) return 2e-7;
+
+        return 1.225;
+
+    }
+
+    //------------------------------------------
+
+    private void calculate(){
+
+        try{
+
+            double M;
+
+            if(editM.getText().toString().isEmpty())
+                M=77000;
+            else
+                M=Double.parseDouble(editM.getText().toString());
+
+            double C;
+
+            if(editC.getText().toString().isEmpty())
+                C=4.5;
+            else
+                C=Double.parseDouble(editC.getText().toString());
+
+            double h;
+
+            if(editH.getText().toString().isEmpty())
+                h=280;
+            else
+                h=Double.parseDouble(editH.getText().toString());
+
+            double rhoEarth=1.225;
+
+            double rhoOrbit=density(h);
+
+            double F=rhoEarth/rhoOrbit;
+
+            double V;
+
+            if(editV.getText().toString().isEmpty()){
+
+                double mu=3.986004418e14;
+
+                double r=(6371+h)*1000;
+
+                V=Math.sqrt(mu/r);
+
+            }
+
+            else{
+
+                V=Double.parseDouble(editV.getText().toString());
+
+            }
+
+            //--------------------------------
+
+            double seconds=(M*C*F)/(V*V);
+
+            double minutes=seconds/60.0;
+
+            double hours=minutes/60.0;
+
+            double days=hours/24.0;
+
+            double years=days/365.25;
+
+            //--------------------------------
+
+            StringBuilder s=new StringBuilder();
+
+            s.append("========== MB4X ==========\n\n");
+
+            s.append(String.format(Locale.US,
+                    "Mass (M): %.2f kg\n",M));
+
+            s.append(String.format(Locale.US,
+                    "Coefficient (C): %.3f\n",C));
+
+            s.append(String.format(Locale.US,
+                    "Altitude (h): %.2f km\n",h));
+
+            s.append(String.format(Locale.US,
+                    "Orbital Density: %.3e kg/m³\n",rhoOrbit));
+
+            s.append(String.format(Locale.US,
+                    "F = %.3e\n",F));
+
+            s.append(String.format(Locale.US,
+                    "Velocity = %.2f m/s\n",V));
+
+            s.append("\n");
+
+            s.append(String.format(Locale.US,
+                    "Lifetime (sec): %.3e\n",seconds));
+
+            s.append(String.format(Locale.US,
+                    "Minutes: %.2f\n",minutes));
+
+            s.append(String.format(Locale.US,
+                    "Hours: %.2f\n",hours));
+
+            s.append(String.format(Locale.US,
+                    "Days: %.2f\n",days));
+
+            s.append(String.format(Locale.US,
+                    "Years: %.3f\n",years));
+
+            s.append("\n");
+
+            s.append("Equation Used\n");
+
+            s.append("L=(M×C×F)/V²\n");
+
+            s.append("F=ρEarth/ρOrbit\n");
+
+            s.append("\n");
+
+            s.append("Experimental Simulator\n");
+            s.append("Developed by Muhammad Dhiyaa Salman\n");
+            s.append("MB4X");
+
+            result.setText(s.toString());
+
+        }
+
+        catch(Exception e){
+
+            result.setText("Error : "+e.getMessage());
+
+        }
+
+    }
+
+}
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.mb4x.orbitalpredictor">
+
+    <application
+        android:allowBackup="true"
+        android:label="MB4X Orbital Predictor"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.AppCompat.Light.DarkActionBar">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+
+            </intent-filter>
+
+        </activity>
+
+    </application>
+
+</manifest>
