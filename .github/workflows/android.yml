@@ -12,14 +12,13 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Build with Buildozer Action
-      uses: ArtemSydoryk/buildozer-action@v1
+      uses: kivy/buildozer-action@v1
       with:
-        workdir: .
-        buildozer_version: stable
+        command: buildozer -v android debug
+        subpath: .
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
       with:
         name: MB4X-Orbital-Predictor-APK
         path: bin/*.apk
-
