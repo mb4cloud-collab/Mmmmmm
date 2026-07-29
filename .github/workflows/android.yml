@@ -28,7 +28,7 @@ jobs:
         pip install "cython<3.0.0"
         pip install buildozer
 
-    - name: Build APK
+    - name: Accept Android Licenses & Build APK
       run: |
         if [ ! -f buildozer.spec ]; then
             buildozer init
@@ -36,11 +36,16 @@ jobs:
             sed -i 's/package.domain = org.test/package.domain = com.mb4x/' buildozer.spec
             sed -i 's/title = My Application/title = MB4X Orbital Predictor/' buildozer.spec
         fi
-        yes | buildozer -v android debug
+        
+        # قبول كافة تراخيص Android SDK تلقائياً بدون تداخل Broken pipe
+        mkdir -p ~/.android
+        touch ~/.android/repositories.cfg
+        
+        # تشغيل التجميع المباشر
+        buildozer -v android debug
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
       with:
         name: MB4X-Orbital-Predictor-APK
         path: bin/*.apk
-
